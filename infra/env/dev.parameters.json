@@ -6,16 +6,16 @@
       "value": "dev"
     },
     "namePrefix": {
-      "value": "corp"
+      "value": "mwcorp01"   // make this UNIQUE to you
     },
     "vnetAddressSpace": {
-      "value": "10.30.0.0/16"
+      "value": "10.20.0.0/16"  // must match the 10.20.x.x subnets
     },
     "appServiceSkuName": {
-      "value": "B1"
+      "value": "S1"            // Standard SKU
     },
     "appServiceSkuTier": {
-      "value": "Basic"
+      "value": "Standard"
     }
   }
 }
