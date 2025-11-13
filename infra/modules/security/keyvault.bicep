@@ -9,11 +9,18 @@ param location string
 @description('SKU name (standard or premium)')
 param skuName string = 'standard'
 
-@description('Enabled for deployment')
-param enabledForDeployment bool = true
+@description('Use RBAC for Key Vault auth')
+param enableRbacAuthorization bool = true
 
-@description('Enabled for template deployment')
-param enabledForTemplateDeployment bool = true
+@description('Enable purge protection (recommended: true for prod)')
+param enablePurgeProtection bool = true
+
+@description('Public network access (Enabled or Disabled)')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccess string = 'Enabled'
 
 resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
@@ -24,13 +31,13 @@ resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
       name: skuName
       family: 'A'
     }
-    enableSoftDelete: true
-    enabledForDeployment: enabledForDeployment
-    enabledForTemplateDeployment: enabledForTemplateDeployment
-    enabledForDiskEncryption: true
-    softDeleteRetentionInDays: 90
-    purgeProtectionEnabled: true
-    accessPolicies: [] // Use RBAC or add policies in another module if needed
+    enableRbacAuthorization: enableRbacAuthorization
+    enablePurgeProtection: enablePurgeProtection
+    publicNetworkAccess: publicNetworkAccess
+    networkAcls: {
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
   }
 }
 

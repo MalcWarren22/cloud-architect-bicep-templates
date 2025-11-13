@@ -106,7 +106,7 @@ module webApi '../modules/compute/appservice-webapi.bicep' = {
 module appDiag '../modules/observability/diagnostics-to-law.bicep' = {
   name: 'appServiceDiagnostics'
   params: {
-    resourceId: webApi.outputs.webAppId
+    webAppName: appName
     workspaceId: monitoring.outputs.lawId
   }
 }

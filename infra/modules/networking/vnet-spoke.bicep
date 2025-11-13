@@ -33,4 +33,12 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-03-01' = {
 }
 
 output vnetId string = vnet.id
-output subnetIds array = [for s in vnet.properties.subnets: s.id]
+
+// Build subnet IDs using the input names 
+output subnetIds array = [
+  for subnet in subnets: az.resourceId(
+    'Microsoft.Network/virtualNetworks/subnets',
+    vnetName,
+    subnet.name
+  )
+]
