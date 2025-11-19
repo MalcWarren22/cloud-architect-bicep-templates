@@ -1,0 +1,37 @@
+flowchart TB
+    subgraph HUB["Hub VNet (10.0.0.0/16)"]
+        AFW["AzureFirewallSubnet"]
+        SS["shared-services"]
+    end
+
+    subgraph SPOKE["Spoke VNet (10.10.0.0/16)"]
+        APP["app-subnet<br/>App Service Integration"]
+        DATA["data-subnet<br/>Private Endpoints"]
+    end
+
+    AFW <-->|Peering| APP
+    SS  <-->|Peering| DATA
+
+    subgraph Compute["Compute Layer"]
+        WEB["App Service Web API<br/>Managed Identity"]
+    end
+
+    APP --> WEB
+
+    subgraph Security["Private Endpoints"]
+        PE_KV["PE - Key Vault"]
+        PE_SQL["PE - SQL Server"]
+        PE_ST["PE - Storage Blob"]
+    end
+
+    DATA --> PE_KV
+    DATA --> PE_SQL
+    DATA --> PE_ST
+
+    subgraph Observability["Observability"]
+        LA["Log Analytics Workspace"]
+        AI["Application Insights"]
+    end
+
+    WEB --> AI
+    AI --> LA
