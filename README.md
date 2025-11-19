@@ -1,94 +1,57 @@
-\# ☁️ Azure Cloud Architect Bicep Templates  
+# ☁️ Azure Cloud Architect Bicep Templates  
+### Enterprise-Grade Landing Zones • Modular Infrastructure • Secure-by-Default
 
-\### Enterprise-Grade Landing Zones • Modular Infrastructure • Secure-by-Default
-
-
-
-This repository provides a complete, production-grade Azure \*\*App Landing Zone\*\* built using modular Bicep templates.  
-
-It follows enterprise Cloud Adoption Framework (CAF) principles while staying fully reusable for any app, project, or business domain.
-
-
+This repository provides a complete, production-grade Azure **App Landing Zone** built entirely with **modular Bicep templates**.  
+It is engineered to mirror enterprise Cloud Adoption Framework (CAF) principles while staying fully reusable for any app, project, or business domain.
 
 ---
 
+## 🚀 Features
 
+### ✔ Modular Hub/Spoke Networking  
+- Hub VNet (`10.0.0.0/16`)  
+- Spoke (App) VNet (`10.10.0.0/16`)  
+- App + Data subnets  
+- NSGs with clean rule abstraction  
+- VNet peering (hub ⇄ spoke)
 
-\## Features
+### ✔ Secure-by-Default Architecture  
+- Azure Key Vault with RBAC auth  
+- Private Endpoints for:
+  - Key Vault  
+  - Storage (Blob)  
+  - SQL Server  
+- Public network access disabled for all data services  
+- App Service VNet integration  
+- System-assigned managed identity for secret access  
 
+### ✔ Compute Layer (App Service Web API)  
+- Linux App Service (configurable SKU)  
+- Injected app settings:
+  - `KEYVAULT_URI`
+  - `STORAGE_BLOB_URL`
+  - `SQL_SERVER_ID`
+  - `SQL_DATABASE_ID`
+  - Application Insights connection settings  
+- Fully isolated inside the App subnet
 
+### ✔ Data Layer (Private-Only)  
+- Storage Account (no public access)  
+- SQL Server + SQL Database (private-only)  
+- Private endpoints in `data-subnet`  
 
-\### ✔ Modular Hub/Spoke Networking  
+### ✔ Observability Layer (Enterprise Logging)  
+- Log Analytics Workspace  
+- Application Insights  
+- Diagnostic settings for:
+  - App Service  
+  - Key Vault (optional)  
+  - SQL + Storage (extendable)
 
-\- Hub VNet (`10.0.0.0/16`)  
-
-\- Spoke (App) VNet (`10.10.0.0/16`)  
-
-\- App + Data subnets  
-
-\- NSGs with clean rule abstraction  
-
-\- Hub ⇄ Spoke peering  
-
-
-
-\### ✔ Secure-by-Default Architecture  
-
-\- Azure Key Vault (RBAC mode)  
-
-\- Private Endpoints for KV, Storage, SQL  
-
-\- App Service VNet integration  
-
-\- Public network disabled for all data resources  
-
-\- Managed Identity access to Key Vault  
-
-
-
-\### ✔ Compute Layer  
-
-\- Linux App Service Web API  
-
-\- Injected app settings: KV, Storage, SQL, App Insights  
-
-\- Secure VNet integration in the `app-subnet`  
-
-\- HTTPS only  
-
-
-
-\### ✔ Data Layer  
-
-\- Storage Account (private-only)  
-
-\- SQL Server + SQL Database (private-only)  
-
-\- Private endpoints in `data-subnet`  
-
-
-
-\### ✔ Observability  
-
-\- Log Analytics Workspace  
-
-\- Application Insights  
-
-\- Diagnostics for App Service, Key Vault, and more  
-
-
-
-\### ✔ Governance  
-
-\- Optional cost budgets  
-
-\- Optional policy assignments (any built-in or custom policy)  
-
-
-
----
-
-
+### ✔ Governance  
+- Optional Monthly Budgets with 90% alert  
+- Optional Policy Assignments at RG scope  
+  (e.g., allowed locations, tag enforcement, private access policies)
 
 ### ✔ Fully Modular Directory Structure
 
@@ -139,7 +102,4 @@ This library is organized by concern. Each module is reusable and environment-ag
 |-------------------------------------------------|------------------------------------------------|
 | `infra/modules/governance/budget.bicep`         | Creates a cost budget with alert thresholds. |
 | `infra/modules/governance/policy-assignment.bicep` | Assigns a built-in or custom Azure Policy at a given scope. |
-
-
-
 
