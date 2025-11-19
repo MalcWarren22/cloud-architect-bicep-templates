@@ -1,29 +1,98 @@
-﻿# Cloud Architect Bicep Templates
+\# ☁️ Azure Cloud Architect Bicep Templates  
 
-A production-grade library of reusable Azure Bicep modules for enterprise cloud architectures.
+\### Enterprise-Grade Landing Zones • Modular Infrastructure • Secure-by-Default
 
-## 📂 Structure
 
-- **infra/main.bicep** — landing zone entrypoint
-- **infra/env/** — dev/test/prod parameter files
-- **infra/modules/** — reusable modules
-  - networking
-  - security
-  - compute
-  - data
-  - observability
-  - governance
-- **scenarios/** — webapp, containerapp, VM landing zones
-- **pipelines/** — GitHub Actions deployment workflow
 
-## 🚀 Purpose
+This repository provides a complete, production-grade Azure \*\*App Landing Zone\*\* built using modular Bicep templates.  
 
-This repository provides modular, parameter-driven infrastructure components for:
-- App hosting (App Service, Container Apps, Functions, VMs)
-- Networking (hub-spoke, NSG, Bastion, Private DNS)
-- Security (Key Vault, private endpoints, RBAC)
-- Data services (Storage, SQL, Cosmos DB)
-- Observability (Log Analytics, App Insights)
-- Governance (Policy, budgets)
+It follows enterprise Cloud Adoption Framework (CAF) principles while staying fully reusable for any app, project, or business domain.
 
-Designed for Cloud Engineers and Cloud Architects building standardized landing zones.
+
+
+---
+
+
+
+\## 🚀 Features
+
+
+
+\### ✔ Modular Hub/Spoke Networking  
+
+\- Hub VNet (`10.0.0.0/16`)  
+
+\- Spoke (App) VNet (`10.10.0.0/16`)  
+
+\- App + Data subnets  
+
+\- NSGs with clean rule abstraction  
+
+\- Hub ⇄ Spoke peering  
+
+
+
+\### ✔ Secure-by-Default Architecture  
+
+\- Azure Key Vault (RBAC mode)  
+
+\- Private Endpoints for KV, Storage, SQL  
+
+\- App Service VNet integration  
+
+\- Public network disabled for all data resources  
+
+\- Managed Identity access to Key Vault  
+
+
+
+\### ✔ Compute Layer  
+
+\- Linux App Service Web API  
+
+\- Injected app settings: KV, Storage, SQL, App Insights  
+
+\- Secure VNet integration in the `app-subnet`  
+
+\- HTTPS only  
+
+
+
+\### ✔ Data Layer  
+
+\- Storage Account (private-only)  
+
+\- SQL Server + SQL Database (private-only)  
+
+\- Private endpoints in `data-subnet`  
+
+
+
+\### ✔ Observability  
+
+\- Log Analytics Workspace  
+
+\- Application Insights  
+
+\- Diagnostics for App Service, Key Vault, and more  
+
+
+
+\### ✔ Governance  
+
+\- Optional cost budgets  
+
+\- Optional policy assignments (any built-in or custom policy)  
+
+
+
+---
+
+
+
+\## 📂 Repository Structure
+
+
+
+
+
