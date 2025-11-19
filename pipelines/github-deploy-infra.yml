@@ -1,0 +1,2 @@
+﻿# GitHub Actions workflow for deploying Azure infrastructure using Bicep
+# TODO: Add login, validate, and deploy steps
