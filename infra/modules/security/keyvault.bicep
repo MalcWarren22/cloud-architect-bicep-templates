@@ -1,0 +1,66 @@
+@description('Name of the Key Vault')
+param name string
+
+@description('Location of the Key Vault')
+param location string
+
+@description('Tenant ID for the Key Vault')
+param tenantId string = tenant().tenantId
+
+@description('Soft delete retention in days')
+param softDeleteRetentionDays int = 7
+
+@description('Enable purge protection')
+param enablePurgeProtection bool = true
+
+@description('Enable RBAC authorization instead of access policies')
+param enableRbacAuthorization bool = true
+
+@description('Optional Log Analytics workspace ID for diagnostics')
+param logAnalyticsWorkspaceId string = ''
+
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
+  name: name
+  location: location
+  properties: {
+    tenantId: tenantId
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    enabledForDeployment: false
+    enabledForDiskEncryption: false
+    enabledForTemplateDeployment: false
+    enableRbacAuthorization: enableRbacAuthorization
+    enablePurgeProtection: enablePurgeProtection
+    softDeleteRetentionInDays: softDeleteRetentionDays
+    publicNetworkAccess: 'Enabled' // we’ll lock this down via private endpoint + firewall later
+  }
+}
+
+// Optional diagnostics to Log Analytics
+resource kvDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
+  name: '${name}-diag'
+  scope: keyVault
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'AuditEvent'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+  }
+}
+
+@description('Key Vault resource ID')
+output keyVaultId string = keyVault.id
+
+@description('Key Vault URI')
+output keyVaultUri string = keyVault.properties.vaultUri
