@@ -6,7 +6,7 @@ It is engineered to mirror enterprise Cloud Adoption Framework (CAF) principles 
 
 ---
 
-## 🚀 Features
+## Features
 
 ### ✔ Modular Hub/Spoke Networking  
 - Hub VNet (`10.0.0.0/16`)  
