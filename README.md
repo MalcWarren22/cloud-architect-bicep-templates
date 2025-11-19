@@ -14,7 +14,7 @@ It follows enterprise Cloud Adoption Framework (CAF) principles while staying fu
 
 
 
-\## 🚀 Features
+\## Features
 
 
 
