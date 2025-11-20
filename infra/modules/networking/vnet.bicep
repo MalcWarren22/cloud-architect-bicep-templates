@@ -57,19 +57,14 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   }
 }
 
-@description('ID of the VNet')
+@description('VNet resource ID')
 output vnetId string = vnet.id
 
-@description('Map of subnet name -> subnet id')
-output subnetIds object = {
-  for s in vnet.properties.subnets: s.name: s.id
-}
+@description('App subnet resource ID')
+output appSubnetId string = vnet.properties.subnets[0].id
 
-@description('App subnet id')
-output appSubnetId string = subnetIds['app']
+@description('Data subnet resource ID')
+output dataSubnetId string = vnet.properties.subnets[1].id
 
-@description('Data subnet id')
-output dataSubnetId string = subnetIds['data']
-
-@description('Monitor subnet id')
-output monitorSubnetId string = subnetIds['monitor']
+@description('Monitor subnet resource ID')
+output monitorSubnetId string = vnet.properties.subnets[2].id

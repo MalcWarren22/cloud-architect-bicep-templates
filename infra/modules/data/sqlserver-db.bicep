@@ -31,6 +31,7 @@ resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
 resource sqlDb 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
   name: dbName
   parent: sqlServer
+  location: location
   sku: {
     name: 'GP_Gen5_2'
     tier: 'GeneralPurpose'
