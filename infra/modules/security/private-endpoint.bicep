@@ -1,39 +1,38 @@
-@description('Name of the private endpoint')
-param name string
+@description('Location for the private endpoint')
+param location string
 
-@description('Target resource ID to connect to (e.g. Key Vault, Storage, SQL)')
+@description('Environment name (dev/test/prod)')
+param environment string
+
+@description('Tags to apply')
+param tags object
+
+@description('Subnet ID where the private endpoint will be placed')
+param vnetSubnetId string
+
+@description('Resource ID of the target service')
 param targetResourceId string
 
-@description('Subnet ID where the private endpoint will live')
-param subnetId string
+@description('Subresource/group name (e.g. "vault", "blob", "sqlServer")')
+param subResourceName string
 
-@description('Group ID for the private link service (e.g. vault, blob, sqlServer)')
-param groupId string
+var peName = 'pe-${last(split(targetResourceId, '/'))}-${environment}'
 
-@description('Enable linking to a Private DNS zone')
-param enablePrivateDns bool = false
-
-@description('Private DNS zone resource ID (required when enablePrivateDns = true)')
-param privateDnsZoneId string = ''
-
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
-  id: subnetId
-}
-
-resource pe 'Microsoft.Network/privateEndpoints@2023-09-01' = {
-  name: name
-  location: resourceGroup().location
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = {
+  name: peName
+  location: location
+  tags: tags
   properties: {
     subnet: {
-      id: subnet.id
+      id: vnetSubnetId
     }
     privateLinkServiceConnections: [
       {
-        name: '${name}-pls'
+        name: 'pls-${environment}'
         properties: {
           privateLinkServiceId: targetResourceId
           groupIds: [
-            groupId
+            subResourceName
           ]
         }
       }
@@ -41,20 +40,4 @@ resource pe 'Microsoft.Network/privateEndpoints@2023-09-01' = {
   }
 }
 
-resource peDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-09-01' = if (enablePrivateDns) {
-  name: 'default'
-  parent: pe
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'config'
-        properties: {
-          privateDnsZoneId: privateDnsZoneId
-        }
-      }
-    ]
-  }
-}
-
-@description('Private endpoint resource ID')
-output privateEndpointId string = pe.id
+output privateEndpointId string = privateEndpoint.id

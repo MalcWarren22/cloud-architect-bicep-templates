@@ -1,43 +1,45 @@
-@description('SQL Server name')
-param name string
-
-@description('Deployment location')
+@description('Location for SQL Server')
 param location string
 
-@description('Administrator username')
-param adminLogin string
+@description('Environment name')
+param environment string
 
-@description('Administrator password')
-@secure()
-param adminPassword string
+@description('Resource name prefix')
+param resourceNamePrefix string
 
-@description('SQL database name')
-param databaseName string
+@description('Tags to apply')
+param tags object
 
-resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
-  name: name
+@description('Subnet for private endpoint (not used directly here)')
+param vnetSubnetId string
+
+var sqlServerName = toLower('${resourceNamePrefix}-sql-${environment}')
+var dbName = 'appdb'
+
+resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
+  name: sqlServerName
   location: location
+  tags: tags
   properties: {
-    administratorLogin: adminLogin
-    administratorLoginPassword: adminPassword
-    publicNetworkAccess: 'Disabled' // force private endpoint access only
+    administratorLogin: 'sqladminuser'
+    administratorLoginPassword: 'P@ssword1234!' // TODO: parameterize/KeyVault in real use
     minimalTlsVersion: '1.2'
+    publicNetworkAccess: 'Disabled'
   }
 }
 
-resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-05-01-preview' = {
-  name: databaseName
+resource sqlDb 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
+  name: dbName
   parent: sqlServer
+  sku: {
+    name: 'GP_Gen5_2'
+    tier: 'GeneralPurpose'
+  }
   properties: {
-    sku: {
-      name: 'Basic'
-      tier: 'Basic'
-    }
+    collation: 'SQL_Latin1_General_CP1_CI_AS'
   }
 }
 
-@description('SQL Server ID')
 output sqlServerId string = sqlServer.id
-
-@description('SQL Database ID')
-output sqlDatabaseId string = sqlDatabase.id
+output sqlServerName string = sqlServer.name
+output databaseName string = sqlDb.name

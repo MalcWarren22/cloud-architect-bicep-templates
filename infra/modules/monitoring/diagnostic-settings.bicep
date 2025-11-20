@@ -1,13 +1,12 @@
-@description('Array of resource IDs to attach diagnostic settings to')
-param targets array
+@description('Array of target resource IDs')
+param targets string[]
 
-@description('Log Analytics Workspace resource ID where diagnostics will be sent')
+@description('Log Analytics workspace ID')
 param workspaceId string
 
-@description('Prefix for diagnostic setting names')
+@description('Diagnostic setting name prefix')
 param namePrefix string = 'diag'
 
-// Basic log categories (will be skipped silently if unsupported on a target)
 var logs = [
   {
     category: 'Audit'
@@ -34,13 +33,9 @@ var metrics = [
   }
 ]
 
-// ------------------------------------------
-// Diagnostic settings per target resource
-// ------------------------------------------
-// NOTE: targets is an array of resource IDs (strings)
 resource diagSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = [
-  for targetId in targets: {
-    name: '${namePrefix}-${last(split(targetId, '/'))}'
+  for (targetId, i) in targets: {
+    name: '${namePrefix}-${i}'
     scope: targetId
     properties: {
       workspaceId: workspaceId

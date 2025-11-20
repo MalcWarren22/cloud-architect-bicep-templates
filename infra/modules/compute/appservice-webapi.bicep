@@ -1,96 +1,65 @@
-@description('Name of the Web App')
-param name string
-
-@description('Location of the Web App')
+@description('Location for App Service')
 param location string
 
-@description('App Service plan SKU name (e.g. P1v2, B1)')
-param skuName string = 'B1'
+@description('Environment name')
+param environment string
 
-@description('App Service plan SKU tier (e.g. Basic, Standard, PremiumV2)')
-param skuTier string = 'Basic'
+@description('Resource name prefix')
+param resourceNamePrefix string
+
+@description('Tags to apply')
+param tags object
 
 @description('Subnet ID for VNet integration')
 param subnetId string
 
-@description('App settings for the Web App')
-param appSettings object = {}
+@description('Key Vault URI (for app settings, optional)')
+param keyVaultUri string
 
-@description('Optional Log Analytics workspace ID for diagnostics')
-param logAnalyticsWorkspaceId string = ''
+var planName = '${resourceNamePrefix}-plan-${environment}'
+var appName  = '${resourceNamePrefix}-webapi-${environment}'
 
-resource plan 'Microsoft.Web/serverfarms@2023-01-01' = {
-  name: '${name}-plan'
+resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
+  name: planName
   location: location
   sku: {
-    name: skuName
-    tier: skuTier
+    name: 'P1v3'
+    tier: 'PremiumV3'
+    size: 'P1v3'
+    capacity: 1
   }
-  properties: {
-    reserved: true // Linux
-  }
+  tags: tags
 }
 
-resource webApp 'Microsoft.Web/sites@2023-01-01' = {
-  name: name
+resource webApp 'Microsoft.Web/sites@2022-09-01' = {
+  name: appName
   location: location
-  kind: 'app,linux'
+  tags: tags
   identity: {
     type: 'SystemAssigned'
   }
   properties: {
-    serverFarmId: plan.id
+    serverFarmId: appPlan.id
     httpsOnly: true
     siteConfig: {
-      linuxFxVersion: 'DOTNETCORE|8.0'
+      virtualNetworkSubnetId: subnetId
       appSettings: [
-        for settingName in union([], appSettings): {
-          name: settingName
-          value: appSettings[settingName]
+        {
+          name: 'ASPNETCORE_ENVIRONMENT'
+          value: environment
+        }
+        {
+          name: 'KEYVAULT_URI'
+          value: keyVaultUri
         }
       ]
-      virtualNetworkSubnetId: subnetId
     }
   }
 }
 
-resource appDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
-  name: '${name}-diag'
-  scope: webApp
-  properties: {
-    workspaceId: logAnalyticsWorkspaceId
-    logs: [
-      {
-        category: 'AppServiceHTTPLogs'
-        enabled: true
-      }
-      {
-        category: 'AppServiceConsoleLogs'
-        enabled: true
-      }
-      {
-        category: 'AppServiceAppLogs'
-        enabled: true
-      }
-      {
-        category: 'AppServicePlatformLogs'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
-  }
-}
-
-@description('Web App resource ID')
 output webAppId string = webApp.id
-
-@description('Web App default hostname')
 output hostname string = webApp.properties.defaultHostName
-
-@description('Managed identity principal ID')
 output principalId string = webApp.identity.principalId
+
+// For Project A expectations
+output appServiceName string = webApp.name

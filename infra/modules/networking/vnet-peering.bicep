@@ -1,43 +1,49 @@
-@description('ID of the first virtual network')
-param vnetAId string
+@description('Resource ID of VNet A (hub)')
+param hubVnetId string
 
-@description('ID of the second virtual network')
-param vnetBId string
+@description('Resource ID of VNet B (spoke)')
+param spokeVnetId string
 
-@description('Name of peering from A to B')
-param nameAToB string
+@description('Allow forwarded traffic')
+param allowForwardedTraffic bool = true
 
-@description('Name of peering from B to A')
-param nameBToA string
+@description('Allow gateway transit')
+param allowGatewayTransit bool = true
 
-resource vnetA 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
-  id: vnetAId
+resource hubVnet 'Microsoft.Network/virtualNetworks@2023-04-01' existing = {
+  name: last(split(hubVnetId, '/'))
 }
 
-resource vnetB 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
-  id: vnetBId
+resource spokeVnet 'Microsoft.Network/virtualNetworks@2023-04-01' existing = {
+  name: last(split(spokeVnetId, '/'))
 }
 
-resource aToB 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2023-09-01' = {
-  name: nameAToB
-  parent: vnetA
+// hub -> spoke
+resource hubToSpoke 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2023-04-01' = {
+  name: 'hub-to-spoke'
+  parent: hubVnet
   properties: {
+    allowForwardedTraffic: allowForwardedTraffic
+    allowGatewayTransit: allowGatewayTransit
+    allowVirtualNetworkAccess: true
+    useRemoteGateways: false
     remoteVirtualNetwork: {
-      id: vnetBId
+      id: spokeVnetId
     }
-    allowForwardedTraffic: true
-    allowGatewayTransit: true
   }
 }
 
-resource bToA 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2023-09-01' = {
-  name: nameBToA
-  parent: vnetB
+// spoke -> hub
+resource spokeToHub 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2023-04-01' = {
+  name: 'spoke-to-hub'
+  parent: spokeVnet
   properties: {
-    remoteVirtualNetwork: {
-      id: vnetAId
-    }
-    allowForwardedTraffic: true
+    allowForwardedTraffic: allowForwardedTraffic
+    allowGatewayTransit: false
+    allowVirtualNetworkAccess: true
     useRemoteGateways: true
+    remoteVirtualNetwork: {
+      id: hubVnetId
+    }
   }
 }
