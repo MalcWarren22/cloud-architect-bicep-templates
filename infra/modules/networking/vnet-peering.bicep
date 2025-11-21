@@ -1,19 +1,21 @@
-@description('Resource ID of VNet A (hub)')
+@description('Resource ID of the hub VNet')
 param hubVnetId string
 
-@description('Resource ID of VNet B (spoke)')
+@description('Resource ID of the spoke VNet')
 param spokeVnetId string
 
 @description('Allow forwarded traffic')
 param allowForwardedTraffic bool = true
 
-@description('Allow gateway transit')
-param allowGatewayTransit bool = true
+@description('Allow gateway transit from hub to spoke (only used if hub has a VPN gateway)')
+param allowGatewayTransit bool = false
 
+// Existing hub VNet
 resource hubVnet 'Microsoft.Network/virtualNetworks@2023-04-01' existing = {
   name: last(split(hubVnetId, '/'))
 }
 
+// Existing spoke VNet
 resource spokeVnet 'Microsoft.Network/virtualNetworks@2023-04-01' existing = {
   name: last(split(spokeVnetId, '/'))
 }
@@ -41,7 +43,7 @@ resource spokeToHub 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@20
     allowForwardedTraffic: allowForwardedTraffic
     allowGatewayTransit: false
     allowVirtualNetworkAccess: true
-    useRemoteGateways: true
+    useRemoteGateways: false 
     remoteVirtualNetwork: {
       id: hubVnetId
     }
