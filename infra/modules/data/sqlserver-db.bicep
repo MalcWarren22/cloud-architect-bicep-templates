@@ -13,6 +13,10 @@ param tags object
 @description('Subnet for private endpoint (not used directly here)')
 param vnetSubnetId string
 
+@secure()
+@description('SQL admin password')
+param administratorLoginPassword string
+
 var sqlServerName = toLower('${resourceNamePrefix}-sql-${environment}')
 var dbName = 'appdb'
 
@@ -22,7 +26,7 @@ resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
   tags: tags
   properties: {
     administratorLogin: 'sqladminuser'
-    administratorLoginPassword: 'P@ssword1234!' // TODO: parameterize/KeyVault in real use
+    administratorLoginPassword: administratorLoginPassword
     minimalTlsVersion: '1.2'
     publicNetworkAccess: 'Disabled'
   }
