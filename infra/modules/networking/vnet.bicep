@@ -22,7 +22,13 @@ param dataSubnetPrefix string
 @description('Monitor subnet CIDR')
 param monitorSubnetPrefix string
 
+@description('Optional NSG resource ID for the app subnet')
+param appSubnetNsgId string?
+
 var vnetName = '${resourceNamePrefix}-vnet-${environment}'
+var appSubnetName = 'app'
+var dataSubnetName = 'data'
+var monitorSubnetName = 'monitor'
 
 resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   name: vnetName
@@ -36,19 +42,23 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
     }
     subnets: [
       {
-        name: 'app'
+        name: appSubnetName
         properties: {
           addressPrefix: appSubnetPrefix
+          // Attach NSG only if provided
+          networkSecurityGroup: appSubnetNsgId == null ? null : {
+            id: appSubnetNsgId
+          }
         }
       }
       {
-        name: 'data'
+        name: dataSubnetName
         properties: {
           addressPrefix: dataSubnetPrefix
         }
       }
       {
-        name: 'monitor'
+        name: monitorSubnetName
         properties: {
           addressPrefix: monitorSubnetPrefix
         }

@@ -41,8 +41,11 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
   properties: {
     serverFarmId: appPlan.id
     httpsOnly: true
+
+    // ✅ VNet integration belongs here, not inside siteConfig
+    virtualNetworkSubnetId: subnetId
+
     siteConfig: {
-      virtualNetworkSubnetId: subnetId
       appSettings: [
         {
           name: 'ASPNETCORE_ENVIRONMENT'
@@ -61,5 +64,5 @@ output webAppId string = webApp.id
 output hostname string = webApp.properties.defaultHostName
 output principalId string = webApp.identity.principalId
 
-// For Project A expectations
+// For Project expectations
 output appServiceName string = webApp.name

@@ -28,13 +28,16 @@ param enableRbacAuthorization bool = true
 @description('Optional Log Analytics workspace ID for diagnostics')
 param logAnalyticsWorkspaceId string = ''
 
-// Reference to avoid unused param warning
-var _unusedTagsReference = tags
+// Combine incoming tags with environment + workload so all params are used
+var kvTags = union(tags, {
+  environment: environment
+  workload: resourceNamePrefix
+})
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: name
   location: location
-  // Note: tags param added for contract alignment but intentionally not applied to avoid logic changes
+  tags: kvTags
   properties: {
     tenantId: tenantId
     sku: {
@@ -47,7 +50,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enableRbacAuthorization: enableRbacAuthorization
     enablePurgeProtection: enablePurgeProtection
     softDeleteRetentionInDays: softDeleteRetentionDays
-    publicNetworkAccess: 'Enabled' // we’ll lock this down via private endpoint + firewall later
+    publicNetworkAccess: 'Enabled' // locked down via private endpoint + firewall later
   }
 }
 

@@ -19,7 +19,10 @@ param rules array
 resource nsg 'Microsoft.Network/networkSecurityGroups@2024-03-01' = {
   name: name
   location: location
-  tags: tags
+  tags: union(tags, {
+    environment: environment
+    workload: resourceNamePrefix
+  })
   properties: {
     securityRules: [
       for rule in rules: {

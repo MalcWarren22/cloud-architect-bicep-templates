@@ -10,15 +10,9 @@ param resourceNamePrefix string
 @description('Tags to apply')
 param tags object
 
-@description('Subnet for private endpoint (not used directly here)')
-param vnetSubnetId string
-
 @secure()
 @description('SQL admin password')
 param administratorLoginPassword string
-
-// Reference to avoid unused param warning
-var _unusedSubnetReference = vnetSubnetId
 
 var sqlServerName = toLower('${resourceNamePrefix}-sql-${environment}')
 var dbName = 'appdb'

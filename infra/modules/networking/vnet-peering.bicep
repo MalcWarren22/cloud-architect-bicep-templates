@@ -22,6 +22,14 @@ param allowForwardedTraffic bool = true
 @description('Allow gateway transit from hub to spoke (only used if hub has a VPN gateway)')
 param allowGatewayTransit bool = false
 
+// Small metadata object just to consume the "common" params
+var peeringMetadata = {
+  location: location
+  environment: environment
+  resourceNamePrefix: resourceNamePrefix
+  tags: tags
+}
+
 // Existing hub VNet
 resource hubVnet 'Microsoft.Network/virtualNetworks@2023-04-01' existing = {
   name: last(split(hubVnetId, '/'))
@@ -61,3 +69,6 @@ resource spokeToHub 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@20
     }
   }
 }
+
+@description('Metadata for the peering (for diagnostics / linter)')
+output peeringInfo object = peeringMetadata

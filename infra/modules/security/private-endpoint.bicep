@@ -19,7 +19,8 @@ param targetResourceId string
 @description('Subresource/group name (e.g. "vault", "blob", "sqlServer")')
 param subResourceName string
 
-var peName = 'pe-${last(split(targetResourceId, '/'))}-${environment}'
+// Use resourceNamePrefix + environment in the name so param is not unused
+var peName = '${resourceNamePrefix}-pe-${subResourceName}-${environment}'
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = {
   name: peName
@@ -31,7 +32,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = {
     }
     privateLinkServiceConnections: [
       {
-        name: 'pls-${environment}'
+        name: '${peName}-pls'
         properties: {
           privateLinkServiceId: targetResourceId
           groupIds: [
