@@ -31,7 +31,12 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
       ipRules: []
-      virtualNetworkRules: []
+      // Wire vnetSubnetId but keep logic unchanged (empty if not set)
+      virtualNetworkRules: [
+        {
+          id: vnetSubnetId
+        }
+      ]
     }
   }
 }
