@@ -1,3 +1,15 @@
+@description('Location for the resource')
+param location string
+
+@description('Environment name (e.g. dev, test, prod)')
+param environment string
+
+@description('Resource name prefix applied to this resource')
+param resourceNamePrefix string
+
+@description('Tags to apply to this resource')
+param tags object
+
 @description('Resource ID of the hub VNet')
 param hubVnetId string
 
@@ -43,7 +55,7 @@ resource spokeToHub 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@20
     allowForwardedTraffic: allowForwardedTraffic
     allowGatewayTransit: false
     allowVirtualNetworkAccess: true
-    useRemoteGateways: false 
+    useRemoteGateways: false
     remoteVirtualNetwork: {
       id: hubVnetId
     }

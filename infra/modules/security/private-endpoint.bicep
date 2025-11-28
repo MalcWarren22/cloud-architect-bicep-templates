@@ -4,6 +4,9 @@ param location string
 @description('Environment name (dev/test/prod)')
 param environment string
 
+@description('Resource name prefix applied to this resource')
+param resourceNamePrefix string
+
 @description('Tags to apply')
 param tags object
 

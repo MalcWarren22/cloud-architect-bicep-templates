@@ -1,8 +1,17 @@
+@description('Location for the resource')
+param location string
+
+@description('Environment name (e.g. dev, test, prod)')
+param environment string
+
+@description('Resource name prefix applied to this resource')
+param resourceNamePrefix string
+
+@description('Tags to apply to this resource')
+param tags object
+
 @description('Name of the Key Vault')
 param name string
-
-@description('Location of the Key Vault')
-param location string
 
 @description('Tenant ID for the Key Vault')
 param tenantId string = tenant().tenantId
@@ -22,6 +31,7 @@ param logAnalyticsWorkspaceId string = ''
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: name
   location: location
+  // Note: tags param added for contract alignment but intentionally not applied to avoid logic changes
   properties: {
     tenantId: tenantId
     sku: {

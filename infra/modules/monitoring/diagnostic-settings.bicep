@@ -1,3 +1,15 @@
+@description('Location for the resource')
+param location string
+
+@description('Environment name (e.g. dev, test, prod)')
+param environment string
+
+@description('Resource name prefix applied to this resource')
+param resourceNamePrefix string
+
+@description('Tags to apply to this resource')
+param tags object
+
 @description('Array of target resource IDs')
 param targets string[]
 
