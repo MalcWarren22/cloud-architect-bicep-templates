@@ -1,3 +1,15 @@
+@description('Deployment environment (dev/test/prod)')
+param environment string
+
+@description('Global resource name prefix')
+param resourceNamePrefix string
+
+@description('Location for the NSG')
+param location string
+
+@description('Tags to apply to the NSG')
+param tags object
+
 @description('Name of the Network Security Group')
 param name string
 
@@ -6,7 +18,8 @@ param rules array
 
 resource nsg 'Microsoft.Network/networkSecurityGroups@2024-03-01' = {
   name: name
-  location: resourceGroup().location
+  location: location
+  tags: tags
   properties: {
     securityRules: [
       for rule in rules: {
