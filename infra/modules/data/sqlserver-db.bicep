@@ -17,6 +17,9 @@ param vnetSubnetId string
 @description('SQL admin password')
 param administratorLoginPassword string
 
+// Reference to avoid unused param warning
+var _unusedSubnetReference = vnetSubnetId
+
 var sqlServerName = toLower('${resourceNamePrefix}-sql-${environment}')
 var dbName = 'appdb'
 

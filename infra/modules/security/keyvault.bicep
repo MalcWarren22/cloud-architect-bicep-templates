@@ -28,6 +28,9 @@ param enableRbacAuthorization bool = true
 @description('Optional Log Analytics workspace ID for diagnostics')
 param logAnalyticsWorkspaceId string = ''
 
+// Reference to avoid unused param warning
+var _unusedTagsReference = tags
+
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: name
   location: location
