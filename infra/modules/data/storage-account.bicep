@@ -29,12 +29,15 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     accessTier: 'Hot'
     allowBlobPublicAccess: false
     minimumTlsVersion: 'TLS1_2'
+    publicNetworkAccess: 'Enabled'
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
+      ipRules: []
       virtualNetworkRules: [
         {
           id: vnetSubnetId
+          action: 'Allow'
         }
       ]
     }

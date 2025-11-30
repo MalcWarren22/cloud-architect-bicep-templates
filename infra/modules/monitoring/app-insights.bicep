@@ -49,11 +49,11 @@ resource appInsightsDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-previ
         enabled: true
       }
       {
-        category: 'PerformanceCounters'
+        category: 'AppPerformanceCounters'
         enabled: true
       }
       {
-        category: 'Exceptions'
+        category: 'AppExceptions'
         enabled: true
       }
     ]
