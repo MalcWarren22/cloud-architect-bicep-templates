@@ -45,10 +45,21 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
         name: appSubnetName
         properties: {
           addressPrefix: appSubnetPrefix
+
           // Attach NSG only if provided
           networkSecurityGroup: appSubnetNsgId == null ? null : {
             id: appSubnetNsgId
           }
+
+          // Delegate subnet for App Service VNet integration
+          delegations: [
+            {
+              name: 'appservice-delegation'
+              properties: {
+                serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
         }
       }
       {
