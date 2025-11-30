@@ -36,7 +36,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 // ------------------------------------------
-// Diagnostic settings
+// Diagnostic settings 
 // ------------------------------------------
 resource appInsightsDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
   name: '${appInsightsName}-diag'
