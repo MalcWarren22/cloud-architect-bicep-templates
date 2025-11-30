@@ -10,7 +10,7 @@ param resourceNamePrefix string
 @description('Tags to apply to this resource')
 param tags object
 
-@description('Name of the Key Vault')
+@description('Name of the Key Vault (base name; a short suffix will be added)')
 param name string
 
 @description('Tenant ID for the Key Vault')
@@ -34,8 +34,12 @@ var kvTags = union(tags, {
   workload: resourceNamePrefix
 })
 
+// Unique Keyvault Names
+var kvSuffix = substring(uniqueString(resourceGroup().id, name), 0, 6)
+var kvName   = '${name}-${kvSuffix}'
+
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: name
+  name: kvName
   location: location
   tags: kvTags
   properties: {
@@ -56,7 +60,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
 
 // Optional diagnostics to Log Analytics
 resource kvDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
-  name: '${name}-diag'
+  name: '${kvName}-diag'
   scope: keyVault
   properties: {
     workspaceId: logAnalyticsWorkspaceId
