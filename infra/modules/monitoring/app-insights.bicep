@@ -19,7 +19,7 @@ param logAnalyticsWorkspaceId string
 var appInsightsName = '${resourceNamePrefix}-appi-${environment}'
 
 // ------------------------------------------
-// Application Insights - Workspace based
+// Application Insights - workspace-based
 // ------------------------------------------
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
@@ -30,11 +30,14 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   })
   properties: {
     Application_Type: 'web'
+    Flow_Type: 'Bluefield'
     WorkspaceResourceId: logAnalyticsWorkspaceId
   }
 }
 
+// ------------------------------------------
 // Diagnostic settings
+// ------------------------------------------
 resource appInsightsDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
   name: '${appInsightsName}-diag'
   scope: appInsights
@@ -42,16 +45,15 @@ resource appInsightsDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-previ
     workspaceId: logAnalyticsWorkspaceId
     logs: [
       {
-        // Valid for workspace-based App Insights
-        category: 'AppRequests'
-        enabled: true
-      }
-      {
         category: 'AppTraces'
         enabled: true
       }
       {
         category: 'PerformanceCounters'
+        enabled: true
+      }
+      {
+        category: 'Exceptions'
         enabled: true
       }
     ]
@@ -64,6 +66,11 @@ resource appInsightsDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-previ
   }
 }
 
-output appInsightsName string = appInsights.name
+@description('App Insights resource ID')
+output appInsightsId string = appInsights.id
+
+@description('App Insights instrumentation key')
 output instrumentationKey string = appInsights.properties.InstrumentationKey
+
+@description('App Insights connection string')
 output connectionString string = appInsights.properties.ConnectionString
