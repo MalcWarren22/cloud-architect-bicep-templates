@@ -19,7 +19,7 @@ param targetResourceId string
 @description('Subresource/group name (e.g. "vault", "blob", "sqlServer")')
 param subResourceName string
 
-// Use resourceNamePrefix + environment in the name so param is not unused
+// Use resourceNamePrefix + environment + subresource in the name
 var peName = '${resourceNamePrefix}-pe-${subResourceName}-${environment}'
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = {

@@ -10,10 +10,12 @@ param resourceNamePrefix string
 @description('Tags to apply')
 param tags object
 
-@description('Subnet ID for future private endpoint (not used directly here)')
+@description('Subnet ID for future private endpoint')
 param vnetSubnetId string
 
-var stgName = toLower(replace('${resourceNamePrefix}stg${environment}', '-', ''))
+// globally unique
+var stgSuffix = substring(toLower(uniqueString(resourceGroup().id, resourceNamePrefix, environment)), 0, 6)
+var stgName   = toLower('${resourceNamePrefix}stg${environment}${stgSuffix}')
 
 resource storage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: stgName
@@ -30,8 +32,6 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
-      ipRules: []
-      // Wire vnetSubnetId but keep logic unchanged (empty if not set)
       virtualNetworkRules: [
         {
           id: vnetSubnetId

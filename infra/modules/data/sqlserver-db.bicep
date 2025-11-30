@@ -14,8 +14,10 @@ param tags object
 @description('SQL admin password')
 param administratorLoginPassword string
 
-var sqlServerName = toLower('${resourceNamePrefix}-sql-${environment}')
-var dbName = 'appdb'
+// SQL server is globally unique
+var suffix        = toLower(substring(uniqueString(resourceGroup().id, resourceNamePrefix, environment), 0, 5))
+var sqlServerName = toLower('${resourceNamePrefix}-sql-${environment}-${suffix}')
+var dbName        = 'appdb'
 
 resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
   name: sqlServerName
@@ -42,6 +44,6 @@ resource sqlDb 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
   }
 }
 
-output sqlServerId string = sqlServer.id
+output sqlServerId   string = sqlServer.id
 output sqlServerName string = sqlServer.name
-output databaseName string = sqlDb.name
+output databaseName  string = sqlDb.name

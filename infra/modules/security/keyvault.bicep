@@ -1,7 +1,7 @@
 @description('Location for the resource')
 param location string
 
-@description('Environment name (e.g. dev, test, prod)')
+@description('Environment name')
 param environment string
 
 @description('Resource name prefix applied to this resource')
@@ -10,7 +10,7 @@ param resourceNamePrefix string
 @description('Tags to apply to this resource')
 param tags object
 
-@description('Name of the Key Vault (base name; a short suffix will be added)')
+@description('Name of the Key Vault (base name)')
 param name string
 
 @description('Tenant ID for the Key Vault')
@@ -28,15 +28,14 @@ param enableRbacAuthorization bool = true
 @description('Optional Log Analytics workspace ID for diagnostics')
 param logAnalyticsWorkspaceId string = ''
 
-// Combine incoming tags with environment + workload so all params are used
+// Tag enrichment so all params are used intentionally
 var kvTags = union(tags, {
   environment: environment
-  workload: resourceNamePrefix
+  workload:    resourceNamePrefix
 })
 
-// Unique Keyvault Names
-var kvSuffix = substring(uniqueString(resourceGroup().id, name), 0, 6)
-var kvName   = '${name}-${kvSuffix}'
+var kvSuffix = toLower(substring(uniqueString(resourceGroup().id, name, environment), 0, 6))
+var kvName   = toLower('${name}-${kvSuffix}')
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: kvName
@@ -48,18 +47,15 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       family: 'A'
       name: 'standard'
     }
-    enabledForDeployment: false
-    enabledForDiskEncryption: false
-    enabledForTemplateDeployment: false
-    enableRbacAuthorization: enableRbacAuthorization
-    enablePurgeProtection: enablePurgeProtection
-    softDeleteRetentionInDays: softDeleteRetentionDays
-    publicNetworkAccess: 'Enabled' // locked down via private endpoint + firewall later
+    // RBAC only, no legacy access policies
+    enableRbacAuthorization:    enableRbacAuthorization
+    enablePurgeProtection:      enablePurgeProtection
+    softDeleteRetentionInDays:  softDeleteRetentionDays
+    publicNetworkAccess:        'Enabled' // locked down via private endpoint + firewall
   }
 }
 
-// Optional diagnostics to Log Analytics
-resource kvDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
+resource kvDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
   name: '${kvName}-diag'
   scope: keyVault
   properties: {
@@ -67,13 +63,13 @@ resource kvDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview
     logs: [
       {
         category: 'AuditEvent'
-        enabled: true
+        enabled:  true
       }
     ]
     metrics: [
       {
         category: 'AllMetrics'
-        enabled: true
+        enabled:  true
       }
     ]
   }

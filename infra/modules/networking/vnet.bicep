@@ -25,9 +25,9 @@ param monitorSubnetPrefix string
 @description('Optional NSG resource ID for the app subnet')
 param appSubnetNsgId string?
 
-var vnetName = '${resourceNamePrefix}-vnet-${environment}'
-var appSubnetName = 'app'
-var dataSubnetName = 'data'
+var vnetName        = '${resourceNamePrefix}-vnet-${environment}'
+var appSubnetName   = 'app'
+var dataSubnetName  = 'data'
 var monitorSubnetName = 'monitor'
 
 resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
@@ -45,12 +45,10 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
         name: appSubnetName
         properties: {
           addressPrefix: appSubnetPrefix
-
           // Attach NSG only if provided
           networkSecurityGroup: appSubnetNsgId == null ? null : {
             id: appSubnetNsgId
           }
-
           // Delegate subnet for App Service VNet integration
           delegations: [
             {
