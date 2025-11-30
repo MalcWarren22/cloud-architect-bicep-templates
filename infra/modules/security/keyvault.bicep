@@ -31,11 +31,12 @@ param logAnalyticsWorkspaceId string = ''
 // Tag enrichment so all params are used intentionally
 var kvTags = union(tags, {
   environment: environment
-  workload:    resourceNamePrefix
+  workload: resourceNamePrefix
 })
+// avoid colliding with an old soft-deleted vault name.
+var kvSuffix = toLower(substring(uniqueString(subscription().id, name, environment), 0, 6))
+var kvName = toLower('${name}-${kvSuffix}')
 
-var kvSuffix = toLower(substring(uniqueString(resourceGroup().id, name, environment), 0, 6))
-var kvName   = toLower('${name}-${kvSuffix}')
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: kvName
