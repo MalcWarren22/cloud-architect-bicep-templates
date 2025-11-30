@@ -34,26 +34,14 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-// (Optional) Diagnostic settings
+// Diagnostic settings
 resource appInsightsDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
   name: '${appInsightsName}-diag'
   scope: appInsights
   properties: {
     workspaceId: logAnalyticsWorkspaceId
-    logs: [
-      {
-        category: 'Requests'
-        enabled: true
-      }
-      {
-        category: 'AppTraces'
-        enabled: true
-      }
-      {
-        category: 'PerformanceCounters'
-        enabled: true
-      }
-    ]
+    // Logs block removed because category 'Requests' is not supported for this resource.
+    // App Insights is already workspace-based, so data still lands in Log Analytics.
     metrics: [
       {
         category: 'AllMetrics'
